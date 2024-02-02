@@ -1,0 +1,63 @@
+version: '3'
+services:
+    public_api:
+        container_name: public_api
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: public_backend
+        restart: "always"
+        ports: 
+            - "8000:15400"
+        environment:
+            - DEBUG=True
+        # env_file:
+        #     - ./public_backend/app/core/settings/env_files/.env
+        depends_on:
+            - postgres
+            - mongo_db
+
+    admin_api:
+        container_name: admin_api
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: admin_backend
+        restart: always
+        ports: 
+            - "7000:15500"
+        environment:
+            - DEBUG=True
+        # env_file:
+        #     - ./public_backend/app/core/settings/env_files/.env
+        depends_on:
+            - postgres
+
+    postgres:
+        image: postgres:15.1-alpine
+        container_name: pdf_postgres
+        environment:
+            - POSTGRES_USER=pdf-converter
+            - POSTGRES_PASSWORD=Cheaters2026
+            - POSTGRES_DB=pdfConverter
+        ports:
+            - "5433:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+
+    mongo_db:
+        image: mongo
+        container_name: pdf_mongodb
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=pdf_admin
+            - MONGO_INITDB_ROOT_PASSWORD=Cheaters2026
+            - MONGO_INITDB_DATABASE=pdfConverter
+        ports:
+            - "27018:27017"
+        volumes:
+            - pdfConverter_mongodb_data:/data/db
+
+volumes:
+    postgres_data:
+    pdfConverter_mongodb_data:
+
